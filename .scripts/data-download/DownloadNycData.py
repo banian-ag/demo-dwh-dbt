@@ -56,7 +56,7 @@ class DownloadNycData:
             else:
                 self.log.info(f"file '{target_file}' already exists")
 
-    def _get_config(self):
+    def _get_config(self) -> dict:
         config_file = path.join(getcwd(), ".scripts", "config.json")
         if not path.exists(config_file):
             raise FileNotFoundError(f"config file not found at '{config_file}'")

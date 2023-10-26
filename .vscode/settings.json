@@ -2,6 +2,10 @@
     "editor.formatOnSave": true,
     "python.formatting.provider": "black",
     "cSpell.words": [
+        "Citus",
+        "dbname",
+        "psycopg",
+        "sqlalchemy",
         "tripdata"
     ]
 }

@@ -1,4 +1,11 @@
 {
+    "CitusDwhConfig": {
+        "host": "localhost",
+        "port": 5432,
+        "dbname": "demo_dwh_dbt",
+        "user": "demo_dwh_dbt",
+        "password": "dummy_pwd"
+    },
     "DownloadNycData": {
         "base_url": "https://d37ci6vzurychx.cloudfront.net/trip-data/",
         "min_year": 2009,
@@ -14,5 +21,10 @@
             "https://d37ci6vzurychx.cloudfront.net/misc/taxi_zones.zip",
             "https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf"
         ]
+    },
+    "LoadNycData": {
+        "schema_name": "raw_data",
+        "table_name": "nyc_yellow_taxi_trip",
+        "batch_size": 100000
     }
 }

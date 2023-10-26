@@ -1,0 +1,106 @@
+# base citus template can be found here:
+# https://raw.githubusercontent.com/citusdata/docker/master/docker-compose.yml
+version: "3.8"
+
+##################################################################################################################
+#  CITUS AUTH
+##################################################################################################################
+x-citus-auth: &citus-auth
+  POSTGRES_USER: "${CITUS_POSTGRES_USER:-dummyuser}"
+  POSTGRES_PASSWORD: "${CITUS_POSTGRES_PASSWORD:-dummypwd}"
+  PGUSER: "${CITUS_POSTGRES_USER:-dummyuser}"
+  PGPASSWORD: "${CITUS_POSTGRES_PASSWORD:-dummypwd}"
+  POSTGRES_HOST_AUTH_METHOD: "${CITUS_POSTGRES_HOST_AUTH_METHOD:-trust}"
+
+services:
+##################################################################################################################
+#  CITUS MASTER
+##################################################################################################################
+  master:
+    container_name: "${COMPOSE_PROJECT_NAME:-citus}_master"
+    image: "${CITUS_IMAGE_DATA:-citusdata/citus:12.0.0}"
+    shm_size: "${CITUS_SHM_SIZE:-2g}"
+    ports: ["${CITUS_COORDINATOR_EXTERNAL_PORT:-5432}:5432"]
+    labels: ["com.citusdata.role=Master"]
+    environment:
+      <<: *citus-auth
+      CITUS_ADDITIONAL_DBS: "${CITUS_ADDITIONAL_DBS:-airflow}"
+      CITUS_RESTORE_SQL: ${CITUS_RESTORE_SQL:-1}
+    volumes:
+      - citus-init-volume:/docker-entrypoint-initdb.d
+      - citus-data-volume-master:/var/lib/postgresql/data
+    restart: always
+    networks:
+      demo-dwh-dbt-network:
+        aliases:
+          - ${CITUS_MASTER_ALIAS:-citus-master}
+##################################################################################################################
+#  CITUS WORKER
+##################################################################################################################
+  worker:
+    container_name: "${COMPOSE_PROJECT_NAME:-citus}_worker"
+    image: "${CITUS_IMAGE_DATA:-citusdata/citus:12.0.0}"
+    shm_size: 1g
+    labels: ["com.citusdata.role=Worker"]
+    depends_on: [manager]
+    environment:
+      <<: *citus-auth
+    command: "/wait-for-manager.sh"
+    volumes:
+      - citus-healthcheck-volume:/healthcheck
+      - citus-data-volume-worker:/var/lib/postgresql/data
+    restart: always
+    networks:
+      demo-dwh-dbt-network:
+        aliases:
+          - ${CITUS_WORKER_ALIAS:-citus-worker}
+##################################################################################################################
+#  CITUS MANAGER
+##################################################################################################################
+  manager:
+    container_name: "${COMPOSE_PROJECT_NAME:-citus}_manager"
+    image: "${CITUS_IMAGE_MANAGER:-citusdata/membership-manager:0.3.0}"
+    volumes:
+      - "${CITUS_DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock"
+      - citus-healthcheck-volume:/healthcheck
+    depends_on: [master]
+    environment:
+      <<: *citus-auth
+    restart: always
+    networks:
+      demo-dwh-dbt-network:
+        aliases:
+          - ${CITUS_MANAGER_ALIAS:-citus-manager}
+
+#########################################################################
+#   Networks
+#########################################################################
+networks:
+  demo-dwh-dbt-network:
+    driver: bridge
+    ipam:
+      driver: default
+
+#########################################################################
+#   Volumes
+#########################################################################
+volumes:
+  citus-healthcheck-volume:
+  citus-init-volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./.volumes/citus/init
+  citus-data-volume-master:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./.volumes/citus/data-master
+  citus-data-volume-worker:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./.volumes/citus/data-worker

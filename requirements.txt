@@ -1,2 +1,7 @@
 black
 requests
+sqlalchemy
+pandas
+psycopg2
+#pyarrow
+fastparquet
