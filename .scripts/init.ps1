@@ -55,6 +55,8 @@ Write-Host "...done!`n" -ForegroundColor Cyan
 # Start docker compose
 ####################################################################
 Write-Host "Starting docker compose..." -ForegroundColor Cyan
+# as preventive measure, remove all containers
+docker compose down
 docker compose --env-file .env.local up -d
 Write-Host "...done!`n" -ForegroundColor Cyan
 

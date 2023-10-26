@@ -14,6 +14,7 @@ from requests import get
 from os import path, makedirs, getcwd
 import json
 import logging
+from datetime import datetime
 
 
 class DownloadNycData:
@@ -28,15 +29,19 @@ class DownloadNycData:
 
     def _get_download_urls(self, config: dict) -> list[str]:
         download_urls = []
+        max_year = config["max_year"]
+        if max_year is None:
+            max_year = datetime.now().year
+        max_month = config["max_year"]
+        if max_month is None:
+            max_month = datetime.now().month
+
         for current_year in range(config["min_year"], config["max_year"] + 1):
             for current_month in range(config["min_month"], 12 + 1):
                 file_name = f"{config['file_prefix']}{current_year}-{current_month:02}.{config['file_extension']}"
                 url = config["base_url"] + file_name
                 download_urls.append(url)
-                if (
-                    current_year == config["max_year"]
-                    and current_month == config["max_month"]
-                ):
+                if current_year == max_year and current_month == max_month:
                     break
         return download_urls
 
@@ -51,8 +56,11 @@ class DownloadNycData:
             if not path.exists(target_file):
                 self.log.info(f"downloading file '{target_file}'")
                 with open(f"{download_folder}{file_name}", "wb") as file:
-                    response = get(url)
-                    file.write(response.content)
+                    try:
+                        response = get(url)
+                        file.write(response.content)
+                    except Exception as e:
+                        self.log.error(f"error downloading file '{file_name}': {e}")
             else:
                 self.log.info(f"file '{target_file}' already exists")
 
