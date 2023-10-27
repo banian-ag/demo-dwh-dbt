@@ -4,7 +4,7 @@ CREATE TABLE raw_data.nyc_yellow_taxi_trip (
 	vendorid int8 NULL,
 	tpep_pickup_datetime timestamp NULL,
 	tpep_dropoff_datetime timestamp NULL,
-	passenger_count int8 NULL,
+	passenger_count float8 NULL,
 	trip_distance float8 NULL,
 	ratecodeid int8 NULL,
 	store_and_fwd_flag varchar(20) NULL,
