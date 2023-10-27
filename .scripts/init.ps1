@@ -21,9 +21,8 @@ python .\.scripts\data-download\DownloadNycData.py
 Write-Host "...done!`n" -ForegroundColor Cyan
 
 ####################################################################
-# Create volumes folders
+# Remove volumes folders
 ####################################################################
-Write-Host "Creating volumes folders..." -ForegroundColor Cyan
 if ($remove) {
     Write-Host "Removing volumes..." -ForegroundColor Cyan
     if (Test-Path -Path .\.volumes\citus\data-master) {
@@ -32,7 +31,13 @@ if ($remove) {
     if (Test-Path -Path .\.volumes\citus\data-worker) {
         Remove-Item -Path .\.volumes\citus\data-worker -Recurse -Force
     }
+    Write-Host "...done!`n" -ForegroundColor Cyan
 }
+
+####################################################################
+# Create volumes folders
+####################################################################
+Write-Host "Creating volumes folders..." -ForegroundColor Cyan
 if (!(Test-Path -Path .\.volumes\citus\data-master)) {
     mkdir .\.volumes\citus\data-master
 }

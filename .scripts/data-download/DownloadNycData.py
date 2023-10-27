@@ -24,43 +24,59 @@ class DownloadNycData:
     def run(self):
         config = self._get_config()
         download_urls = self._get_download_urls(config)
-        self._download_files(config["download_folder"], download_urls)
-        self._download_files(config["meta_data_folder"], config["meta_data_file_urls"])
+        self._download_files(
+            config["DownloadNycData"]["download_folder"],
+            config["LoadNycData"]["load_folder"],
+            download_urls,
+        )
+        self._download_files(
+            config["DownloadNycData"]["meta_data_folder"],
+            config["LoadNycData"]["load_folder"],
+            config["DownloadNycData"]["meta_data_file_urls"],
+        )
 
     def _get_download_urls(self, config: dict) -> list[str]:
         download_urls = []
-        max_year = config["max_year"]
+        max_year = config["DownloadNycData"]["max_year"]
         if max_year is None:
             max_year = datetime.now().year
-        max_month = config["max_year"]
+        max_month = config["DownloadNycData"]["max_month"]
         if max_month is None:
             max_month = datetime.now().month
 
-        for current_year in range(config["min_year"], config["max_year"] + 1):
-            for current_month in range(config["min_month"], 12 + 1):
-                file_name = f"{config['file_prefix']}{current_year}-{current_month:02}.{config['file_extension']}"
-                url = config["base_url"] + file_name
+        for current_year in range(config["DownloadNycData"]["min_year"], max_year + 1):
+            for current_month in range(config["DownloadNycData"]["min_month"], 12 + 1):
+                file_name = f"{config['DownloadNycData']['file_prefix']}{current_year}-{current_month:02}.{config['DownloadNycData']['file_extension']}"
+                url = config["DownloadNycData"]["base_url"] + file_name
                 download_urls.append(url)
                 if current_year == max_year and current_month == max_month:
                     break
         return download_urls
 
-    def _download_files(self, download_folder: str, download_urls: list[str]):
+    def _download_files(
+        self, download_folder: str, load_folder: str, download_urls: list[str]
+    ):
         # create folder if not exists
         if not path.exists(download_folder):
             self.log.info(f"creating folder '{download_folder}'")
             makedirs(download_folder)
         for url in download_urls:
             file_name = url.split("/")[-1]
-            target_file = f"{download_folder}{file_name}"
-            if not path.exists(target_file):
+            target_file = path.join(download_folder, file_name)
+            if not path.exists(target_file) and not path.exists(
+                path.join(load_folder, file_name)
+            ):
                 self.log.info(f"downloading file '{target_file}'")
-                with open(f"{download_folder}{file_name}", "wb") as file:
-                    try:
-                        response = get(url)
+                try:
+                    response = get(url)
+                    if response.status_code != 200:
+                        raise FileExistsError(
+                            f"error downloading file '{file_name}': {response.status_code}"
+                        )
+                    with open(target_file, "wb") as file:
                         file.write(response.content)
-                    except Exception as e:
-                        self.log.error(f"error downloading file '{file_name}': {e}")
+                except Exception as e:
+                    self.log.error(f"error downloading file '{file_name}': {e}")
             else:
                 self.log.info(f"file '{target_file}' already exists")
 
@@ -71,7 +87,6 @@ class DownloadNycData:
         config = None
         with open(config_file, "r") as file:
             config = json.load(file)
-        config = config["DownloadNycData"]
         self.log.info(f"using config: {config}")
         return config
 

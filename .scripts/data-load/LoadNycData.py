@@ -13,6 +13,8 @@ from sqlalchemy import create_engine, Engine
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import threading
+import psycopg2
+from io import StringIO
 
 
 class LoadNycData:
@@ -81,7 +83,7 @@ class LoadNycData:
 
     def _get_data_files(self, config: dict) -> list[str]:
         data_files = []
-        data_folder = config["DownloadNycData"]["download_folder"]
+        data_folder = config["LoadNycData"]["load_folder"]
         file_prefix = config["DownloadNycData"]["file_prefix"]
         file_extension = config["DownloadNycData"]["file_extension"]
         for file_name in listdir(data_folder):
@@ -107,10 +109,13 @@ class LoadNycData:
     def _get_data_frame(self, data_file: str) -> pd.DataFrame:
         df = pd.read_parquet(data_file)
         df.columns = df.columns.str.lower()
-        df["file_name"] = data_file
+        # add meta data columns
+        df["meta_row_number"] = df.index
+        df["meta_file_name"] = path.basename(data_file)
+
         return df
 
-    def _insert_chunk(
+    def _insert_chunk_old(
         self, chunk: pd.DataFrame, engine: Engine, schema_name: str, table_name: str
     ):
         chunk.to_sql(
@@ -121,6 +126,35 @@ class LoadNycData:
             schema=schema_name,
         )
         self._chunk_added(len(chunk))
+
+    def _insert_chunk(
+        self, chunk: pd.DataFrame, engine: Engine, schema_name: str, table_name: str
+    ):
+        try:
+            connection = engine.raw_connection()
+            cursor = connection.cursor()
+
+            # Create a CSV representation of the DataFrame
+            csv_buffer = StringIO()
+            chunk.to_csv(csv_buffer, sep="\t", header=False, index=False)
+            csv_buffer.seek(0)
+
+            # Copy data from the CSV buffer to the table
+            cursor.copy_expert(
+                f"COPY {schema_name}.{table_name} FROM stdin WITH CSV DELIMITER as E'\\t'",
+                csv_buffer,
+            )
+
+            connection.commit()
+
+            self._chunk_added(len(chunk))
+
+        except (Exception, psycopg2.Error) as error:
+            print(f"Error: {error}")
+        finally:
+            if connection is not None:
+                cursor.close()
+                connection.close()
 
     def _chunk_added(self, chunk_size):
         # lock inserted rows

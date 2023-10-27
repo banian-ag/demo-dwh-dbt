@@ -8,7 +8,7 @@
     },
     "DownloadNycData": {
         "base_url": "https://d37ci6vzurychx.cloudfront.net/trip-data/",
-        "min_year": 2009,
+        "min_year": 2011,
         "min_month": 1,
         "max_year": null,
         "max_month": null,
@@ -25,7 +25,8 @@
     "LoadNycData": {
         "schema_name": "raw_data",
         "table_name": "nyc_yellow_taxi_trip",
-        "batch_size": 15000,
-        "parallelism": 8
+        "batch_size": 100000,
+        "parallelism": 8,
+        "load_folder": "./.data/nyc/yellow-trip-data/"
     }
 }
