@@ -35,10 +35,10 @@ echo "...done!"
 if [ "$remove" ]; then
     echo "Removing volumes..." 
     if [ -d ./.volumes/citus/data-master ]; then
-        sudo rm -rf ./.volumes/citus/data-master
+        rm -rf ./.volumes/citus/data-master
     fi
     if [ -d ./.volumes/citus/data-worker ]; then
-        sudo rm -rf ./.volumes/citus/data-worker
+        rm -rf ./.volumes/citus/data-worker
     fi
     echo "...done!" 
 fi
