@@ -16,7 +16,7 @@ done
 ####################################################################
 echo "Initializing virtual environment and installing dependencies..." 
 if [ ! -d .venv ]; then
-    python -m venv .venv
+    python3 -m venv .venv
 fi
 source .venv/Scripts/Activate
 pip install -r requirements.txt
@@ -26,7 +26,7 @@ echo "...done!"
 # Download data files
 ####################################################################
 echo "Downloading data files..." 
-python ./.scripts/data-download/DownloadNycData.py
+python3 ./.scripts/data-download/DownloadNycData.py
 echo "...done!" 
 
 ####################################################################
@@ -62,7 +62,7 @@ echo "...done!"
 # Create local env file
 ####################################################################
 echo "Creating local env file..." 
-python ./.scripts/docker-env/BuildLocalEnvFile.py
+python3 ./.scripts/docker-env/BuildLocalEnvFile.py
 echo "...done!" 
 
 ####################################################################
@@ -79,5 +79,5 @@ echo "...done!"
 ####################################################################
 echo "Start data load..." 
 sleep 20
-python ./.scripts/data-load/LoadNycData.py
+python3 ./.scripts/data-load/LoadNycData.py
 echo "...done!"
