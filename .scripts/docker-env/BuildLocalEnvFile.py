@@ -17,7 +17,7 @@ class LoadNycData:
         self._build_local_env_file(config)
 
     def _build_local_env_file(self, config: dict):
-        env_file = path.join(getcwd(), ".env")
+        env_file = path.join(getcwd(), ".env.template")
         local_env_file = path.join(getcwd(), ".env.local")
         with open(env_file, "r") as file, open(local_env_file, "w") as local_file:
             for line in file.readlines():
