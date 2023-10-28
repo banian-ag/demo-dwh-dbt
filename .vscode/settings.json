@@ -7,5 +7,21 @@
         "psycopg",
         "sqlalchemy",
         "tripdata"
-    ]
+    ],
+    "files.associations": {
+        "*.sql": "jinja-sql"
+    },
+    "[jinja-sql]": {
+        "editor.defaultFormatter": "innoverio.vscode-dbt-power-user",
+        "editor.formatOnSave": false
+    },
+    "python.defaultInterpreterPath": "./.venv/Scripts/python.exe",
+    "dbt.profilesDirOverride": "./.dbt",
+    "dbt.dbtPythonPathOverride": "./.venv/Scripts/python.exe",
+    "dbt.queryLimit": 500,
+    //must be applied in user settings!
+    "python.interpreter.infoVisibility": "always",
+    "terminal.integrated.env.[osx|windows|linux]": {
+        "DBT_PROFILES_DIR": "./.dbt"
+    }
 }

@@ -78,7 +78,7 @@ class LoadNycData:
                 table_name,
             )
             self.log.info(
-                f"loaded {((i+batch_size)/len(df)*100):.2f}% of file '{data_file}'"
+                f"loaded {((i+batch_size-1)/len(df)*100):.2f}% of file '{data_file}'"
             )
 
     def _get_data_files(self, config: dict) -> list[str]:
