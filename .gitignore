@@ -3,6 +3,7 @@
 .volumes/citus/data-master/
 .volumes/citus/data-worker/
 .env.local
+.dbt/
 
 # .gitignore template from src: https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore
 # Byte-compiled / optimized / DLL files
