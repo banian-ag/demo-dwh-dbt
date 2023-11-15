@@ -14,5 +14,4 @@
         {{ custom_schema_name | trim }}
         {{ log("Setting Custom Schema: {0}".format(custom_schema_name | trim)) }}
     {%- endif -%}
-
 {%- endmacro %}
