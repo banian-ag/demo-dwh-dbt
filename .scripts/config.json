@@ -8,7 +8,7 @@
     },
     "DownloadNycData": {
         "base_url": "https://d37ci6vzurychx.cloudfront.net/trip-data/",
-        "min_year": 2011,
+        "min_year": 2023,
         "min_month": 1,
         "max_year": null,
         "max_month": null,

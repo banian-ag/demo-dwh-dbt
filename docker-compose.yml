@@ -31,7 +31,7 @@ services:
       - citus-data-volume-master:/var/lib/postgresql/data
     restart: always
     networks:
-      demo-dwh-dbt-network:
+      demo-dwh-dbt-network-citus:
         aliases:
           - ${CITUS_MASTER_ALIAS:-citus-master}
 ##################################################################################################################
@@ -51,7 +51,7 @@ services:
       - citus-data-volume-worker:/var/lib/postgresql/data
     restart: always
     networks:
-      demo-dwh-dbt-network:
+      demo-dwh-dbt-network-citus:
         aliases:
           - ${CITUS_WORKER_ALIAS:-citus-worker}
 ##################################################################################################################
@@ -68,18 +68,57 @@ services:
       <<: *citus-auth
     restart: always
     networks:
-      demo-dwh-dbt-network:
+      demo-dwh-dbt-network-citus:
         aliases:
           - ${CITUS_MANAGER_ALIAS:-citus-manager}
 
+#  doris-fe:
+#    image: apache/doris:2.0.0_alpha-fe-x86_64
+#    hostname: fe
+#    environment:
+#     - FE_SERVERS=fe1:${DORIS_FE_ALIAS:-fe}:9010
+#     - FE_ID=1
+#    volumes:
+#     - /data/fe/doris-meta/:/opt/apache-doris/fe/doris-meta/
+#     - /data/fe/log/:/opt/apache-doris/fe/log/
+#    ports:
+#      - 8030:8030
+#      - 9030:9030
+#      - 9010:9010
+#    networks:
+#      demo-dwh-dbt-network-doris:
+#        aliases:
+#          - ${DORIS_FE_ALIAS:-fe}
+#
+#  doris-be:
+#    image: apache/doris:2.0.0_alpha-be-x86_64
+#    hostname: be
+#    environment:
+#     - FE_SERVERS=fe1:${DORIS_FE_ALIAS:-fe}:9010
+#     - BE_ADDR=${DORIS_BE_ALIAS:-be}:9050
+#    volumes:
+#     - /data/be/storage/:/opt/apache-doris/be/storage/
+#     - /data/be/script/:/docker-entrypoint-initdb.d/
+#    ports:
+#      - 8040:8040
+#    depends_on:
+#      - doris-fe
+#    networks:
+#      demo-dwh-dbt-network-doris:
+#        aliases:
+#          - ${DORIS_BE_ALIAS:-doris-be}
 #########################################################################
 #   Networks
 #########################################################################
 networks:
-  demo-dwh-dbt-network:
+  demo-dwh-dbt-network-citus:
     driver: bridge
     ipam:
       driver: default
+#  demo-dwh-dbt-network-doris:
+#    driver: bridge
+#    ipam:
+#      driver: default
 
 #########################################################################
 #   Volumes

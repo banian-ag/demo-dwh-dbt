@@ -10,6 +10,7 @@ if (!(Test-Path -Path .venv)) {
     python -m venv .venv
 }
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 Write-Host "...done!`n" -ForegroundColor Cyan
 
@@ -69,6 +70,6 @@ Write-Host "...done!`n" -ForegroundColor Cyan
 # Load the raw data
 ####################################################################
 Write-Host "Start data load..." -ForegroundColor Cyan
-Start-Sleep -s 20
+Start-Sleep -s 40
 python .\.scripts\data-load\LoadNycData.py
 Write-Host "...done!`n" -ForegroundColor Cyan

@@ -9,7 +9,8 @@ from os import path, getcwd, listdir
 import json
 import logging
 import pandas as pd
-from sqlalchemy import create_engine, Engine
+from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import threading
