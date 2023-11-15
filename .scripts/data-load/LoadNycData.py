@@ -78,8 +78,11 @@ class LoadNycData:
                 schema_name,
                 table_name,
             )
+            load_percentage = (i + batch_size - 1) / len(df) * 100
+            if load_percentage > 100:
+                load_percentage = 100
             self.log.info(
-                f"loaded {((i+batch_size-1)/len(df)*100):.2f}% of file '{data_file}'"
+                f"loaded {load_percentage:.2f}% of file '{data_file}'"
             )
 
     def _get_data_files(self, config: dict) -> list[str]:
