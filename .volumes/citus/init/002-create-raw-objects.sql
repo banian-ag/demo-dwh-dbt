@@ -1,7 +1,7 @@
 create schema if not exists raw_data;
 drop table if exists raw_data.nyc_yellow_taxi_trip;
 CREATE TABLE raw_data.nyc_yellow_taxi_trip (
-	vendorid int8 NULL,
+	vendorid float8 NULL,
 	tpep_pickup_datetime timestamp NULL,
 	tpep_dropoff_datetime timestamp NULL,
 	passenger_count float8 NULL,
@@ -10,7 +10,7 @@ CREATE TABLE raw_data.nyc_yellow_taxi_trip (
 	store_and_fwd_flag varchar(20) NULL,
 	pulocationid float8 NULL,
 	dolocationid float8 NULL,
-	payment_type int8 NULL,
+	payment_type float8 NULL,
 	fare_amount float8 NULL,
 	extra float8 NULL,
 	mta_tax float8 NULL,
